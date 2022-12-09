@@ -35,18 +35,18 @@
 
 #define RUNTIME 113500                      // Valor para executar o percurso 
 
+
+int p1,p2,p3,p4,p5,p6;
+
 void setup() {
   Serial.begin(9600);
-  ledControl(13, true, 500);
-  ledControl(13, false, 500);
-  ledControl(13, true, 500);
-  ledControl(13, false, 500);
+ 
 }
 
 void loop() {
   controlerPID();
   // TESTE 1°: leituta sensor
-  //readSensors(true, s);
+  //converte(true, s);
   // TESTE 2°: motor esquerda
   //motorOption('4',255,255);
   // TESTE 3°: motor direita
@@ -116,75 +116,47 @@ bool motorStop(long runtime, long currentTime) {
   // Função de parada do robô
   if (millis() >= (runtime + currentTime)) {
     motorOption('0', 0, 0);
-    int cont = 0;
-    while (true) {
-      ledControl(13, true, 250);
-      ledControl(13, false, 250);
-      cont++;
-    }
     return false;
   }
   return true;
 }
 
-void rgbControl(int red, int green, int blue, long rumtime) {
-  // Função para controle do led rgb
-  pinMode(PINLEDR, OUTPUT);
-  pinMode(PINLEDG, OUTPUT);
-  pinMode(PINLEDB, OUTPUT);
+void converte (int *valor_sensor, int valor_cor){
 
-  digitalWrite(PINLEDR, HIGH);
-  digitalWrite(PINLEDG, HIGH);
-  digitalWrite(PINLEDB, HIGH);
-
-  analogWrite(PINLEDR, red);
-  analogWrite(PINLEDG, green);
-  analogWrite(PINLEDB, blue);
-  delay(rumtime);
-}
-
-void ledControl(int led, bool status, long rumtime) {
-  // Função para controle do led
-  pinMode(led, OUTPUT);
-  if (status) {
-    digitalWrite(led, HIGH);
-  } else {
-    digitalWrite(led, LOW);
-  }
-  delay(rumtime);
-}
-
-void readSensors(bool readSerial, int *sensors) {
-  // Função para leitura dos sensores
-  sensors[0] = analogRead(S1);
-  sensors[1] = analogRead(S2);
-  sensors[2] = analogRead(S3);
-  sensors[3] = analogRead(S4);
-  sensors[4] = analogRead(S5);
-  sensors[5] = analogRead(S6);
-  if (readSerial) {
-    Serial.print(sensors[0]);
-    Serial.print(' ');
-    Serial.print(sensors[1]);
-    Serial.print(' ');
-    Serial.print(sensors[2]);
-    Serial.print(' ');
-    Serial.print(sensors[3]);
-    Serial.print(' ');
-    Serial.print(sensors[4]);
-    Serial.print(' ');
-    Serial.println(sensors[5]);
-  }
+  valor_sensor[0] = analogRead(S1);
+  valor_sensor[1] = analogRead(S2);
+  valor_sensor[2] = analogRead(S3);
+  valor_sensor[3] = analogRead(S4);
+  valor_sensor[4] = analogRead(S5);
+  valor_sensor[5] = analogRead(S6);
 
 
+  if(valor_sensor[0]<= valor_cor)p1=1;
+  else p1=0;
+  if(valor_sensor[1]<= valor_cor)p2=1;
+  else p2=0;
+  if(valor_sensor[2]<= valor_cor)p3=1;
+  else p3=0;
+  if(valor_sensor[3]<= valor_cor)p4=1;
+  else p4=0;
+  if(valor_sensor[4]<= valor_cor)p5=1;
+  else p5=0;
+  if(valor_sensor[5]<= valor_cor)p6=1;
+  else p6=0;
+
+  
   
 }
 
 void controlerPID(){
-  
-  float Kp = 50; //variaveis para o PID
+
+  float position = followLineMEF();
+  int error = position - 3500;
+
+
+ float Kp = 35; //variaveis para o PID
   float Ki = 0;
-  float Kd = 25;
+  float Kd = 35;
    
 
   float lastError = 0;
@@ -194,10 +166,6 @@ void controlerPID(){
   const uint8_t maxspeedb = 255;
   const uint8_t basespeeda = 155;
   const uint8_t basespeedb = 155;
-
-  float position = followLineMEF();
-  int error = position - 3500;
-
   
   lastError = error;
   int motorspeed = (Kp*error) + (Ki*totalError) + (Kd*(error-lastError));
@@ -233,22 +201,8 @@ float followLineMEF(void) {
 
     // Leitura sensores
     int s[6];
-    readSensors(false, s);
+    converte(s, 700);
     float error;
-    int p1,p2,p3,p4,p5,p6;
-    
-  if(s[0]<= TRESHOLD)p1=1;
-  else p1=0;
-  if(s[1]<= TRESHOLD)p2=1;
-  else p2=0;
-  if(s[2]<= TRESHOLD)p3=1;
-  else p3=0;
-  if(s[3]<= TRESHOLD)p4=1;
-  else p4=0;
-  if(s[4]<= TRESHOLD)p5=1;
-  else p5=0;
-  if(s[5]<= TRESHOLD)p6=1;
-  else p6=0;
       
     
     // leitura do sensor (1 1 1 1 1 1)
@@ -320,5 +274,7 @@ float followLineMEF(void) {
       motorOption('4', SPEED7, SPEED7);
       error = 4;
     }
+    
   }
+  
 }
