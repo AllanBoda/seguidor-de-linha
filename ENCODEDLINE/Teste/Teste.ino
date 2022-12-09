@@ -20,7 +20,7 @@
 #define S6 A5
 
 // Valores de ajustes para o seguidor de linha MIF
-#define TRESHOLD 700                       // Valor de referencia para cor da linha branca
+
 #define SPEED0 255                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 0 0) 
 #define SPEED1 220                          // Valor de 0 a 255 para velocidade com a seguinte leitura do sensor (0 0 1 1 1 0) 
 #define SPEED8 200
